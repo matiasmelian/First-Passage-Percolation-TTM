@@ -5,7 +5,7 @@ import random
 
 
 def grid_canvas(xlim: int, ylim: int, points: list[int], edges: list[tuple], 
-                color: str = 'purple') -> None:
+                color: str = 'purple', title: str = '') -> None:
     """
     Crea el gráfico de una cuadrícula [0, x] X [0, y]
     Colorea los puntos de la lista points y aristas de la lista edges
@@ -26,6 +26,7 @@ def grid_canvas(xlim: int, ylim: int, points: list[int], edges: list[tuple],
     plt.grid(True)
     plt.gca().set_aspect('equal')
 
+    plt.title(title, pad=10)
     plt.show()
 
 
@@ -75,10 +76,10 @@ def dijkstra(xlim: int, ylim: int, adj: np.array, src: tuple) -> np.array:
 def reconstruir_geo(inicio: tuple, final: tuple, ancestros: list[tuple]) -> list[tuple]:
     geodesica = []
     vtc = final
-    geodesica.append(vtc)
     while vtc != inicio:
-        vtc = ancestros[*vtc]
-        geodesica.append(vtc)
+        ancst = ancestros[*vtc]
+        geodesica.append((vtc, ancst))
+        vtc = ancst
     return geodesica
 
 
@@ -111,7 +112,8 @@ def fpp(xlim: int, ylim: int, gen) -> np.array:
 
 
 if __name__ == "__main__":
-    n = 20
+    n = 50
+    m = 25
     x = np.linspace(0, n, n + 1)
     y = x
 
@@ -124,15 +126,16 @@ if __name__ == "__main__":
     plt.gca().set_aspect('equal')
 
     environment = fpp(n, n, lambda: random.expovariate(1))
-    dists, ancestros = dijkstra(n, n, environment, (0, 0))
+    dists, ancestros = dijkstra(n, n, environment, (m, m))
 
     for a in range(n + 1):
         for b in range(n + 1):
 
-            if a == 0 and b == 0:
+            if a == m and b == m:
                 continue
 
             ancestro = ancestros[a, b]
             plt.plot((a, ancestro[0]), (b, ancestro[1]), color='purple', lw=3)
 
+    plt.title("Geodésicas desde (50, 50)")
     plt.show()
