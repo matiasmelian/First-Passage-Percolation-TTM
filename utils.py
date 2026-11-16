@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import heapq
 import random
+from collections import deque
 
 
 def grid_canvas(xlim: int, ylim: int, points: list[int], edges: list[tuple], 
@@ -30,7 +31,28 @@ def grid_canvas(xlim: int, ylim: int, points: list[int], edges: list[tuple],
     plt.show()
 
 
-def dijkstra(xlim: int, ylim: int, adj: np.array, src: tuple) -> np.array:
+def bfs(xlim: int, ylim: int, adj: np.ndarray, src: tuple) -> np.ndarray:
+    """
+    Corre BFS desde el vértice fuente src y en un grafo con matriz de 
+    adyacencia adj, y retorna un np.array que guarda para cada par (a, b)
+    un 1 si es alcanzable desde src y un 0 si no.
+    """
+    cola = deque()
+    visitados = np.zeros((xlim + 1, ylim + 1))
+    cola.append(src)
+    visitados[src] = 1
+    while cola:
+        visitando = cola.popleft()
+        visitados[visitando] = 1
+        for vertice, vecino in adj[visitando]:
+            if vecino and not visitados[vertice]: 
+                cola.append(vertice) 
+                visitados[vertice] = 1
+
+    return visitados
+
+
+def dijkstra(xlim: int, ylim: int, adj: np.ndarray, src: tuple) -> np.ndarray:
     """
     Adaptado del código de https://www.geeksforgeeks.org
     Corre el algoritmo de dijkstra para obtener la distancia mínima 
@@ -83,7 +105,7 @@ def reconstruir_geo(inicio: tuple, final: tuple, ancestros: list[tuple]) -> list
     return geodesica
 
 
-def fpp(xlim: int, ylim: int, gen) -> np.array:
+def fpp(xlim: int, ylim: int, gen) -> np.ndarray:
     """
     Recibe una función func que genera números aleatorios (iid)
     y devuelve un np.array que guarda para cada vértice (a, b), 
